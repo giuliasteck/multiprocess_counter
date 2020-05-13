@@ -12,7 +12,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#define MAX_PROCESSES 3
+#define MAX_PROCESSES 4
 
 int isPrime (int num){
 	if (num == 1 || num == 0)
@@ -28,15 +28,16 @@ int isPrime (int num){
 
 int main() {
 
-	pid_t pid[MAX_PROCESSES]; //criar processos filhos a partir do pai
-	int *shared_mem;
+	pid_t pid[MAX_PROCESSES]; 
+	int *shared_mem; //Memória Compartilhada
 	int num_children = 0;
-	int *pos_mem;
+	int *pos_mem; //Utilizado para percorrer a memória
 	int *resultado;
 	char c;
 
 	shared_mem = (int*)mmap(NULL, sizeof(int)*1000, PROT_READ | PROT_WRITE, MAP_SHARED|MAP_ANON, 0, 0);
 
+	
 	resultado = &(shared_mem[0]);
 	pos_mem = &(shared_mem[1]);
 	(*pos_mem) = 2;
@@ -46,24 +47,29 @@ int main() {
 	}
 	while((c = getchar()) != '\n');
 
+
+	int dadPid = getpid();
+
 	for (num_children; num_children<MAX_PROCESSES; num_children++){
-		fflush(stdout);
 		pid[num_children] = fork();
 		if (pid[num_children] == 0)
 			break;
 	}
 
+	//Percorre o vetor da entrada para dar como resultado a quantidade de números primos
 	while((*pos_mem)>= 2){		
 		(*pos_mem)--;
 		(*resultado) += isPrime(shared_mem[*pos_mem]); 
 	}
 
-	for(int i = 0; i<MAX_PROCESSES; i++)
-		waitpid(pid[i], NULL,0);
 
-	printf("%d\n", *resultado);
+	//Espera o retorno de todos os processos filhos
+	while(wait(NULL) > 0); 
 
-	munmap(shared_mem, sizeof(int)*1000);
+	if(dadPid == getpid())
+		printf("%d\n", *resultado);
+
+	munmap(shared_mem, sizeof(int)*1000); 
 
 
 	return 0;
