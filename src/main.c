@@ -71,6 +71,5 @@ int main() {
 
 	munmap(shared_mem, sizeof(int)*1000); 
 
-
 	return 0;
 }
