@@ -36,7 +36,6 @@ int main() {
 	char c;
 
 	shared_mem = (int*)mmap(NULL, sizeof(int)*1000, PROT_READ | PROT_WRITE, MAP_SHARED|MAP_ANON, 0, 0);
-
 	
 	resultado = &(shared_mem[0]);
 	pos_mem = &(shared_mem[1]);
@@ -46,7 +45,6 @@ int main() {
 		scanf("%d",&(shared_mem[(*pos_mem)++]));
 	}
 	while((c = getchar()) != '\n');
-
 
 	int dadPid = getpid();
 
